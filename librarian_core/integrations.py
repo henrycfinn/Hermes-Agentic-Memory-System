@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import subprocess
 from difflib import SequenceMatcher
@@ -63,6 +64,8 @@ def _run(args: list[str], cwd: Path | None = None, timeout: int = 60) -> tuple[i
             cwd=str(cwd) if cwd else None,
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             timeout=timeout,
             check=False,
             env=os.environ.copy(),
@@ -81,6 +84,35 @@ def qmd_status() -> dict[str, Any]:
         "ok": code == 0,
         "summary": (out or err)[:2000],
     }
+
+
+def hermes_memory_provider_status() -> dict[str, Any]:
+    """Inspect the current Hermes profile through its CLI, without importing Hermes internals.
+
+    The provider is distinct from the QMD executable. Unknown output or a missing
+    CLI is inconclusive, not an indication that QMD memory is healthy or broken.
+    """
+    command = shutil.which("hermes")
+    if not command:
+        return {"state": "unknown", "detail": "Hermes CLI not found in this environment."}
+    code, out, _ = _run([command, "memory", "status"], timeout=30)
+    if code:
+        return {"state": "unknown", "detail": "Hermes memory status could not be checked."}
+    selected = re.search(r"(?im)^\s*Provider:\s*(\S+)", out)
+    if not selected:
+        return {"state": "unknown", "detail": "Hermes did not report a recognizable provider."}
+    provider = selected.group(1).strip("`'\"").lower()
+    if provider != "qmd":
+        return {"state": "not_selected", "provider": provider, "detail": "QMD is not the selected Hermes memory provider."}
+    plugin = re.search(r"(?im)^\s*Plugin:\s*(not installed|turned off|missing|installed)\b", out)
+    availability = re.search(r"(?im)^\s*Status:\s*(not available|unavailable|available)\b", out)
+    if plugin and plugin.group(1).lower() != "installed":
+        return {"state": "unavailable", "provider": "qmd", "detail": "QMD is selected but its Hermes memory provider is missing or disabled. Installing the QMD CLI alone does not install that provider."}
+    if not plugin or not availability:
+        return {"state": "unknown", "provider": "qmd", "detail": "QMD is selected, but its provider status could not be determined."}
+    if availability.group(1).lower() != "available":
+        return {"state": "unavailable", "provider": "qmd", "detail": "QMD is selected but its Hermes memory provider is missing or unavailable. Installing the QMD CLI alone does not install that provider."}
+    return {"state": "available", "provider": "qmd", "detail": "The selected QMD memory provider reports available."}
 
 
 def _extract_qmd_paths(payload: Any, root: Path) -> list[Path]:

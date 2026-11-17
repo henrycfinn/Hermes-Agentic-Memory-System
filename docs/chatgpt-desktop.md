@@ -1,6 +1,6 @@
 # ChatGPT Desktop connector
 
-The ChatGPT Desktop Librarian connector lets **ChatGPT Work** and Codex retrieve
+The ChatGPT Desktop Librarian connector lets **ChatGPT Desktop / Work** retrieve
 notes from an existing canonical Markdown knowledge base. It is not ChatGPT's
 native account memory and it does not make the vault automatically available in
 every conversation. A user must connect the MCP service to ChatGPT Work and use
@@ -16,7 +16,7 @@ The connector exposes only three MCP tools:
 
 It never exposes `.obsidian`, `.git`, trash, pending proposals, or paths outside
 the configured root. It does not write notes. Durable writes still use the
-Librarian change/proposal workflow in Hermes or Codex.
+Librarian change/proposal workflow in Hermes.
 
 ## Run locally
 
@@ -64,13 +64,12 @@ The tunnel client and this connector must remain healthy for retrieval to work.
 The tunnel is an explicit retrieval capability, not an automatic long-term-memory
 replacement.
 
-For this repository's configured `ChatGPT Desktop Librarian` tunnel, run the
-launcher from a normal user PowerShell session after setting
+For your own configured tunnel, run the launcher from a normal user PowerShell session after setting
 `CONTROL_PLANE_API_KEY` in the user environment:
 
 ```powershell
 $env:WIKI_PATH = 'C:\path\to\your\wiki'
-.\scripts\start_chatgpt_desktop_tunnel.ps1
+.\scripts\start_chatgpt_desktop_tunnel.ps1 -TunnelId <your-tunnel-id>
 ```
 
 It starts the read-only connector in explicit loopback-only tunnel mode on port

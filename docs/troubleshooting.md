@@ -58,6 +58,12 @@ QMD is optional. The plugin continues with filesystem duplicate checking.
 
 If expected, verify `qmd` is on PATH in the same environment that launches Hermes.
 
+## Hermes says the `qmd` memory provider is not installed
+
+The QMD CLI is not a Hermes memory-provider plugin, and Agentic Librarian does not install one. Run `hermes memory status` in the affected profile. If `memory.provider: qmd` is selected without a compatible installed provider, select Hermes' built-in/default provider or separately install and verify a trusted QMD provider. Do not change another profile's settings or remove the QMD index. See [QMD integration](obsidian-qmd.md#hermes-memory-provider-is-separate).
+
+The Librarian doctor reports `hermes_memory_provider` as unavailable only when Hermes explicitly reports the selected QMD plugin missing, disabled, or unavailable. If Hermes or its status format cannot be checked, the result is `unknown`; verify it manually rather than interpreting that result as proof of a working provider.
+
 ## QMD index is not refreshed
 
 `qmd_sync` defaults to `off`. Enable `update` or `update_and_embed` only after confirming your QMD setup is safe to invoke automatically.

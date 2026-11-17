@@ -1,6 +1,6 @@
 # ChatGPT Desktop Librarian
 
-Purpose: A local-first ChatGPT Desktop, Codex, and Hermes integration for an existing Markdown knowledge base. ChatGPT Desktop receives explicit read-only retrieval through OpenAI Secure MCP Tunnel; Codex and Hermes share deterministic write governance. Routine low-risk changes may auto-apply. Destructive, conflicting, low-confidence, control-file, raw-source mutation, major-rewrite, and other risky changes are staged for selective human review.
+Purpose: A local-first ChatGPT Desktop and Hermes integration for an existing Markdown knowledge base. ChatGPT Desktop receives explicit read-only retrieval through OpenAI Secure MCP Tunnel; Hermes provides deterministic write governance. Routine low-risk changes may auto-apply. Destructive, conflicting, low-confidence, control-file, raw-source mutation, major-rewrite, and other risky changes are staged for selective human review.
 
 Canonical architecture:
 - User's Markdown folder / Obsidian vault: source of truth.
@@ -30,8 +30,6 @@ Start here:
 - README.md — human overview, installation, usage.
 - AGENTS.md — coding-agent invariants and contribution instructions.
 - skills/librarian/SKILL.md — runtime Hermes workflow.
-- skills/codex-librarian/SKILL.md — runtime Codex workflow.
-- scripts/codex_librarian.py — Codex adapter sharing the policy core and proposal/receipt store with Hermes.
 - docs/architecture.md — components and transaction state machine.
 - docs/configuration.md — settings and autonomy modes.
 - docs/hermes-llm-wiki.md — how to wrap the built-in llm-wiki skill.

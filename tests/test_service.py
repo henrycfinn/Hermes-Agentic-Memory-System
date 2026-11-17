@@ -31,6 +31,14 @@ class ServiceTests(unittest.TestCase):
     def parse(self, value):
         return json.loads(value)
 
+    @mock.patch("librarian_core.integrations.hermes_memory_provider_status", return_value={"state": "unavailable", "detail": "Missing QMD provider"})
+    def test_doctor_reports_missing_selected_qmd_provider(self, _probe):
+        result = self.parse(service.doctor(self.cfg()))
+        self.assertIn("hermes_memory_provider", result["failed"])
+        check = next(c for c in result["checks"] if c["name"] == "hermes_memory_provider")
+        self.assertFalse(check["ok"])
+        self.assertIn("Missing QMD provider", check["detail"])
+
     def test_safe_new_file_auto_applies_and_receipts_exist(self):
         result = self.parse(service.change(self.cfg(), {
             "summary": "Add note",

@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [string]$KnowledgeRoot = $env:WIKI_PATH,
-    [string]$TunnelId = 'tunnel_6ade5ff08df48191bb92ea39413955b0',
+    [Parameter(Mandatory = $true)][string]$TunnelId,
     [int]$Port = 8766
 )
 
@@ -38,7 +38,7 @@ $connector = Start-Process -FilePath $python -WorkingDirectory $repositoryRoot -
     '--knowledge-root', $KnowledgeRoot,
     '--tunnel-only',
     '--port', $Port
-) -RedirectStandardOutput $connectorStdout -RedirectStandardError $connectorStderr -PassThru
+) -RedirectStandardOutput $connectorStdout -RedirectStandardError $connectorStderr -WindowStyle Hidden -PassThru
 
 try {
     $healthy = $false

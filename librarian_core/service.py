@@ -831,6 +831,9 @@ def doctor(config: LibrarianConfig, args: dict[str, Any] | None = None) -> str:
     add("pending_proposals", True, f"{len(pending)} pending")
     qmd = qmd_status() if qmd_available() else {"available": False}
     add("qmd", not qmd.get("available") or bool(qmd.get("ok")), json.dumps(qmd, ensure_ascii=False))
+    from .integrations import hermes_memory_provider_status
+    provider = hermes_memory_provider_status()
+    add("hermes_memory_provider", provider["state"] != "unavailable", json.dumps(provider, ensure_ascii=False))
     repo = git_repo_root(root) if root and git_available() else None
     add("git", not git_available() or root is None or repo is not None, "available or not configured")
     failed = [item["name"] for item in checks if not item["ok"]]

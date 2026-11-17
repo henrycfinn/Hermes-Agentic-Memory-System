@@ -1,7 +1,7 @@
 # ChatGPT Desktop Librarian
 
 A local-first knowledge connector and trust-aware governance layer for **ChatGPT
-Desktop, Codex, and Hermes Agent** knowledge bases.
+Desktop and Hermes Agent** knowledge bases.
 
 It adds selective human-in-the-loop review **without turning every wiki edit into an approval prompt**. Routine knowledge work can remain autonomous; destructive, conflicting, low-confidence, or unusually large changes are staged for review.
 
@@ -80,8 +80,6 @@ Applying a staged proposal **re-hashes its target files and the proposal envelop
 
 - Hermes Agent with the native Python plugin system.
 - Python standard library only for this plugin.
-
-For Codex, use the included local CLI adapter and `codex-librarian` skill; Hermes itself is not required for Codex to run the policy core.
 
 For ChatGPT Desktop, use the optional Streamable HTTP MCP connector through an
 authenticated OpenAI Secure MCP Tunnel.
@@ -213,6 +211,8 @@ The plugin does **not** copy knowledge into a second database or wiki.
 
 When QMD is installed, new-note preflight uses a fast read-only search to surface likely filename/title duplicates. QMD results are locators; the Markdown file remains authoritative.
 
+**QMD is not automatically a Hermes memory provider.** This plugin integrates with the QMD CLI for duplicate checks and optional index maintenance; it does not install a provider named `qmd` or automatically inject search results into Hermes conversations. Leave Hermes' `memory.provider` on its built-in/default setting unless a compatible QMD memory-provider plugin is separately installed for that profile. Run `hermes memory status` to check the selected provider and `hermes agentic-librarian doctor` for an additional diagnostic. See [QMD setup and troubleshooting](docs/obsidian-qmd.md#hermes-memory-provider-is-separate).
+
 Post-write QMD sync is **off by default**. You can opt into:
 
 - `off`
@@ -248,17 +248,6 @@ Nothing else is required. Point `knowledge_root` at a Markdown folder. The plugi
 | `librarian_history` | List receipts without note bodies. |
 | `librarian_configure` | Change core plugin settings through native approval. |
 
-## Codex alongside Hermes
-
-Codex uses the same core rather than a parallel knowledge layer. The adapter shares the proposal and receipt store with Hermes, so a risky change staged by Codex remains visible to Hermes and vice versa.
-
-```powershell
-$env:CODEX_LIBRARIAN_REPO = 'C:\path\to\Hermes-Agentic-Librarian'
-python "$env:CODEX_LIBRARIAN_REPO\scripts\codex_librarian.py" --knowledge-root C:\path\to\knowledge status
-```
-
-Install the versioned `skills/codex-librarian` folder in Codex's global skills directory, then start a new Codex task. The skill routes durable knowledge writes through `change --request`, surfaces staged proposals, and requires both explicit user approval and `apply --approve` to mutate a staged proposal. See [Configuration](docs/configuration.md#codex-adapter).
-
 Slash command:
 
 ```text
@@ -268,7 +257,7 @@ Slash command:
 /librarian help
 ```
 
-## ChatGPT Desktop alongside Codex and Hermes
+## ChatGPT Desktop alongside Hermes
 
 The optional ChatGPT Desktop connector serves three read-only MCP tools:
 `search_memory`, `read_memory`, and `memory_status`. It keeps the existing
@@ -360,8 +349,6 @@ This repository is designed to be discoverable by both people and coding agents:
 - [`AGENTS.md`](AGENTS.md) — implementation invariants and contribution instructions for coding agents;
 - [`llms.txt`](llms.txt) — compact machine-readable project map;
 - [`skills/librarian/SKILL.md`](skills/librarian/SKILL.md) — runtime workflow for Hermes;
-- [`skills/codex-librarian/SKILL.md`](skills/codex-librarian/SKILL.md) — runtime workflow for Codex;
-- [`scripts/codex_librarian.py`](scripts/codex_librarian.py) — local Codex CLI adapter;
 - [`docs/architecture.md`](docs/architecture.md) — component and transaction model;
 - [`docs/configuration.md`](docs/configuration.md) — settings and autonomy modes;
 - [`docs/hermes-llm-wiki.md`](docs/hermes-llm-wiki.md) — wrapper integration;

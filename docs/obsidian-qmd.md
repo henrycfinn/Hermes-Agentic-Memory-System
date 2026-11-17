@@ -21,6 +21,14 @@ It does not require an Obsidian community plugin and does not edit `.obsidian/` 
 
 Existing folder organization is respected. A mature vault should not be migrated merely to satisfy a plugin taxonomy.
 
+## Hermes memory provider is separate
+
+The QMD CLI and its index, Librarian's QMD duplicate preflight, and a Hermes `memory.provider` plugin are separate integrations. This repository provides the first integration through an existing QMD installation; it does **not** supply a Hermes memory provider called `qmd` or enable automatic recall in conversations.
+
+Do not set `memory.provider: qmd` merely because QMD is installed. Use Hermes' built-in/default provider unless you separately install and verify a compatible QMD provider for the relevant profile. Run `hermes memory status` in the same profile and environment as the gateway; if it says QMD is selected but its plugin is missing, unavailable, or disabled, restore the built-in/default setting or install a provider you trust. Do not change a working provider automatically.
+
+`hermes agentic-librarian doctor` checks the CLI's provider status when Hermes is available. An `unknown` result means the check could not determine the provider; it does not certify it. Restart the affected Hermes session or gateway after an intentional provider change. QMD's index can become stale even when both CLI and provider are available; inspect `qmd status` and refresh deliberately as described below.
+
 ## QMD duplicate preflight
 
 If `qmd` is on PATH and `qmd_duplicate_check` is enabled, the plugin performs a read-only search before creating a new Markdown file.

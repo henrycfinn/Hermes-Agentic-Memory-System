@@ -29,7 +29,7 @@ from librarian_core import integrations
 MAX_FILE_BYTES = 1_000_000
 MAX_RESULTS = 20
 SEARCHABLE_SUFFIXES = {".md", ".mdx", ".txt", ".rst", ".org"}
-EXCLUDED_PARTS = {".git", ".obsidian", ".trash", ".Trash"}
+EXCLUDED_PARTS = {".git", ".obsidian", ".trash", "plugin-data", "proposals", "receipts"}
 
 
 class VaultAccessError(ValueError):
@@ -44,7 +44,7 @@ def _resolve_root(raw_root: str | Path) -> Path:
 
 
 def _is_searchable(path: Path) -> bool:
-    return path.suffix.lower() in SEARCHABLE_SUFFIXES and not any(part in EXCLUDED_PARTS for part in path.parts)
+    return path.suffix.lower() in SEARCHABLE_SUFFIXES and not any(part.lower() in EXCLUDED_PARTS for part in path.parts)
 
 
 def _excerpt(text: str, terms: list[str], limit: int = 360) -> str:
@@ -95,11 +95,14 @@ class VaultReader:
             if not candidate.is_file():
                 continue
             relative = candidate.relative_to(self.root)
-            if not _is_searchable(relative) or candidate.stat().st_size > MAX_FILE_BYTES:
+            if not _is_searchable(relative):
                 continue
             try:
+                resolved_relative = candidate.resolve(strict=True).relative_to(self.root)
+                if not _is_searchable(resolved_relative) or candidate.stat().st_size > MAX_FILE_BYTES:
+                    continue
                 content = candidate.read_text(encoding="utf-8", errors="replace")
-            except OSError:
+            except (OSError, ValueError):
                 continue
             lowered = content.lower()
             title = relative.stem.lower()
@@ -142,10 +145,10 @@ class VaultReader:
             results.append({"path": relative.as_posix(), "score": None, "excerpt": _excerpt(content, terms)})
             if len(results) >= limit:
                 break
-        return results
+        return results or None
 
     def search_backend(self) -> str:
-        return "qmd indexed retrieval" if integrations.qmd_available() else "local lexical fallback (QMD unavailable)"
+        return "QMD preferred; local lexical fallback if unavailable or no results" if integrations.qmd_available() else "local lexical fallback (QMD unavailable)"
 
 
 def create_server(reader: VaultReader):

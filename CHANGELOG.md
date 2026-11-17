@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Diagnose a selected but missing or disabled Hermes QMD memory provider, separately from QMD CLI availability.
+- Clarify that this plugin does not install a QMD memory provider or turn on automatic conversational recall.
+
 All notable changes to this project will be documented here.
 
 ## [1.2.0] - 2026-10-24
