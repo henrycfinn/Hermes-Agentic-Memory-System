@@ -75,7 +75,7 @@ class VaultReaderTests(unittest.TestCase):
         candidate.write_text("outside-probe-secret", encoding="utf-8")
         real_resolve = Path.resolve
         def resolve(path, *args, **kwargs):
-            return Path(self.temp.name) / "outside.md" if path == candidate else real_resolve(path, *args, **kwargs)
+            return Path(self.temp.name) / "outside.md" if path.name == candidate.name else real_resolve(path, *args, **kwargs)
         with mock.patch.object(chatgpt_desktop_mcp.integrations, "qmd_available", return_value=False), \
              mock.patch.object(Path, "resolve", resolve):
             self.assertEqual(self.reader.search("outside-probe-secret"), [])
